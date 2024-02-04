@@ -1,4 +1,4 @@
-CreditScore,Age,Tenure,Balance,NumOfProducts,IsActiveMember,EstimatedSalary,Gender_Male,Geography_LabelEncoded,Exited
+credit_score,age,tenure,balance,num_of_products,is_active_member,estimated_salary,gender_male,geography_labeled,exited
 619,42,2,0.0,1,1,101348.88,False,0,1
 608,41,1,83807.86,1,1,112542.58,False,2,0
 502,42,8,159660.8,3,0,113931.57,False,0,1
