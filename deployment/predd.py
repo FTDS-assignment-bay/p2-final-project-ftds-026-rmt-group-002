@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd 
 import numpy as np 
 import pickle
-from sklearn.metrics._dist_metrics import EuclideanDistance
-from sklearn.metrics.pairwise import euclidean_distances
+# from sklearn.metrics._dist_metrics import EuclideanDistance
+# from sklearn.metrics.pairwise import euclidean_distances
 
 from PIL import Image
 
