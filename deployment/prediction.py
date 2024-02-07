@@ -5,9 +5,9 @@ import pickle
 from PIL import Image
 
 
-# Choice of input: Upload or Manual Input
-inputType = st.selectbox("How would you like to input data ?", ["Upload Excel or CSV File", "Manual Input"])
-st.markdown('---')
+# # Choice of input: Upload or Manual Input
+# inputType = st.selectbox("How would you like to input data ?", ["Upload Excel or CSV File", "Manual Input"])
+# st.markdown('---')
 
 
 
