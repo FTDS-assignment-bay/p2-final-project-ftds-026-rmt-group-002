@@ -35,7 +35,7 @@ def run():
 
         col_left, col_mid, col_right = st.columns([2, 2, 2])
 
-        gender =  col_left.selectbox('Gender', ('Male', 'Female'), index=0)
+        gender =  col_left.selectbox('gender', ('Male', 'Female'), index=0)
         with col_mid:
             age = st.number_input('Age', min_value=18, max_value=95) 
         with col_right:
@@ -58,14 +58,14 @@ def run():
         num_of_products = st.number_input('Num of Products', min_value=1 , max_value=4, help='Amount of product or services used (max=4)')
 
         col1, col2 = st.columns([1, 1])
-        HasCrCard = col1.radio(label='Has Credit Card?', options=['no', 'yes'])
-        is_active_member = col2.radio(label='Is Active Member?', options=['no', 'yes'])
+        has_credit_card = col1.radio(label='Has Credit Card?', options=['no', 'yes'])
+        active_member = col2.radio(label='Is Active Member?', options=['no', 'yes'])
 
 
         # submit button
         submitted = st.button('Predict')
 
-        with open('model_knn.pkl', 'rb') as file_2:
+        with open('model_xgb.pkl', 'rb') as file_2:
             model = pickle.load(file_2)
         with open('list_cat_cols.txt', 'rb') as file_3:
             cat_cols = json.load(file_3)
@@ -76,16 +76,16 @@ def run():
         data_inf = {
             'CustomerId' : cust_id,
             'Surname' : surname,
-            'Geography' : geography,
+            'geography' : geography,
             'age' : age,
-            'Gender' : gender,
+            'gender' : gender,
             'tenure' : tenure,
             'credit_score' : creditscore,
             'balance' : balance,
             'estimated_salary' : estimated_salary,
             'num_of_products' : num_of_products,
-            'HasCrCard' : HasCrCard,
-            'is_active_member' : is_active_member
+            'has_credit_card' : has_credit_card,
+            'active_member' : active_member
         }
 
         # memasukkan data inference ke dataframe
@@ -95,8 +95,8 @@ def run():
         # logic ketika predict button ditekan
         if submitted:
             data_inf_drop = data_inf.drop(['CustomerId', 'Surname'], axis=1)
-            # Create a new column "NewTenure"
-            data_inf_drop["NewTenure"] = data_inf_drop["tenure"] / data_inf_drop["age"]
+            # # Create a new column "NewTenure"
+            # data_inf_drop["NewTenure"] = data_inf_drop["tenure"] / data_inf_drop["age"]
 
         # predict
             y_pred_inf = model.predict(data_inf_drop)
@@ -109,6 +109,7 @@ def run():
 
             st.write('## Bank Customer Churn Prediction')
             st.write('### Customer Data')
+
             uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
 
             #Condition upload data
@@ -128,9 +129,9 @@ def run():
                     df_uploaded.drop('Surname', axis=1, inplace=True)
 
                 if 'tenure' in df_uploaded.columns:
-                    df_uploaded['NewTenure']= df_uploaded["tenure"] / df_uploaded["age"]
+                    # df_uploaded['NewTenure']= df_uploaded["tenure"] / df_uploaded["age"]
 
-                    df_uploaded.columns = ['Surname', 'Geography', 'age', 'Gender', 'tenure', 'credit_score', 'balance', 'estimated_salary', 'num_of_products', 'HasCrCard', 'is_active_member', 'NewTenure']
+                    df_uploaded.columns = ['Surname', 'geography', 'age', 'gender', 'tenure', 'credit_score', 'balance', 'estimated_salary', 'num_of_products', 'has_credit_card', 'active_member']
 
                 y_pred_inf = model.predict(df_uploaded)
                 #Menambahkan hasil predict ke dataframe
@@ -142,7 +143,7 @@ def run():
 
     with tab3:
         # Menambahkan hyperlink ke dashboard Looker
-        looker_dashboard_url = "https://lookerstudio.google.com/u/0/reporting/c04b0784-8233-4169-ac57-ad49b03b0a6a/page/CPSpD"
+        looker_dashboard_url = "https://lookerstudio.google.com/s/omKUXbpaEps"
         st.markdown(f"Go to Looker Dashboard: [{looker_dashboard_url}]({looker_dashboard_url})")
 
 if __name__ == '__main__':
