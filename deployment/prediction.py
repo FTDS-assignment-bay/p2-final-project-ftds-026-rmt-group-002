@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np 
 import pickle
 import json
+import joblib
 from PIL import Image
 
 def run():
@@ -64,12 +65,13 @@ def run():
         submitted = st.button('Predict')
 
         # load files
-        with open('model_rf.pkl', 'rb') as file_2:
-            model = pickle.load(file_2)
+        # with open('model_rf.pkl', 'rb') as file_2:
+        #     model = pickle.load(file_2)
         with open('list_cat_cols.txt', 'rb') as file_3:
             cat_cols = json.load(file_3)
         with open('list_num_cols.txt', 'rb') as file_4:
             num_cols = json.load(file_4)
+        model = joblib.load('model_rf.joblib')
 
         
         data_inf = {
