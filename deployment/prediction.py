@@ -64,7 +64,7 @@ def run():
         submitted = st.button('Predict')
 
         # load files
-        with open('model_xgb.pkl', 'rb') as file_2:
+        with open('model_rf.pkl', 'rb') as file_2:
             model = pickle.load(file_2)
         with open('list_cat_cols.txt', 'rb') as file_3:
             cat_cols = json.load(file_3)
