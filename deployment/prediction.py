@@ -2,117 +2,121 @@ import streamlit as st
 import pandas as pd 
 import numpy as np 
 import pickle
+import json
 from PIL import Image
 
-
-# # Choice of input: Upload or Manual Input
-# inputType = st.selectbox("How would you like to input data ?", ["Upload Excel or CSV File", "Manual Input"])
-# st.markdown('---')
-
-
-
 def run():
+    # membagi layout menjadi 3 agar dapat diletakkan di tengah
+    col_left, col_mid, col_right = st.columns([2, 2, 2])
+    # menambahkan gambar
+    image = Image.open('image.webp')
+    with col_mid :
+        st.image(image)
+        # membuat title
+        st.title("ChurnSight")
 
-    # membuat title
-    st.title("Bank Customer's Churn Prediction")
+    col_left, col_mid, col_right = st.columns([1.5, 3, 1.5])
+    with col_mid :
+        st.write("#### Bank Customer Churn Prediction")
 
-    # membuat subheader
-    # st.subheader('Data Form Input Churn Classification')
 
-    # menambahkan gambar 
-    # image = Image.open('1.jpeg')
-    # st.image(image)
+    tab1, tab2 = st.tabs(["Prediction Form", "EDA"])
+    #tab1 form input prediction
+    with tab1:
+        # Create Form
+        st.markdown('-----------------')
+        st.write('Identity Information')
 
-    with st.form('Form Customer Churn Prediction'):
-
-        # field customer id
+        surname = st.text_input('Name', value='', help='Customer Name')
         cust_id = st.number_input('Customer ID', min_value=0, max_value=10000)
+        geography = st.selectbox('Country', ('France', 'Spain', 'Germany'))
 
-        # field surname
-        surname = st.text_input ('Name :')
+        col_left, col_mid, col_right = st.columns([2, 2, 2])
 
-        # field gender
-        gender_options = ["Male", "Female"]
-        gender = st.selectbox('Pilih Gender', gender_options)
+        gender =  col_left.selectbox('gender', ('Male', 'Female'), index=0)
+        with col_mid:
+            age = st.number_input('Age', min_value=18, max_value=95) 
+        with col_right:
+            tenure = st.number_input('Tenure (Year)', min_value=1, max_value=10, step=1)
 
-        # field tenure
-        age = st.number_input('Age', min_value=18, max_value=95)
+        st.markdown('-----------------')
+        st.write('Financial Information')
 
-        # field tenure
-        tenure = st.number_input('Tenure', min_value=0, max_value=10, help='How long someone be customer (in years)')
+        col_left, col_mid, col_right = st.columns([2, 2, 2])
+        with col_left:
+            creditscore = st.number_input('Credit Score', min_value=300 , max_value=900, help='How likely to pay a loan back on time, based on information from credit report')
+        with col_mid:
+            balance = st.number_input('Balance', min_value=0, max_value=350000, help='Amount of Balance')
+        with col_right:
+            estimated_salary = st.number_input('Estimated Salary', min_value=0, max_value=350000, help='Estimated customer salary')
 
-    with st.form('Financial Information'):
+        st.markdown('-----------------')
+        st.write('Services and Membership')
 
-        # field credit score
-        creditscore = st.number_input('Credit Score', min_value=300 , max_value=900, help='How likely to pay a loan back on time, based on information from credit report')
-
-        # field balance
-        balance = st.number_input('Balance', min_value=0, max_value=350000, help='Amount of Balance')
-
-        # field estimated salary
-        estimated_salary = st.number_input('Estimated Salary', min_value=0, max_value=350000, help='Estimated customer salary')
-
-    with st.form('Services and Membership'):
-
-        # field num of products
         num_of_products = st.number_input('Num of Products', min_value=1 , max_value=4, help='Amount of product or services used (max=4)')
 
-        # field has credit card
-        HasCrCard_options = [0, 1]
-        HasCrCard = st.selectbox('Has Credit Card', HasCrCard_options)
-        st.write("0 = Don't have credit card")
-        st.write("1 = Has credit card")
-        
-        # field active member
-        is_active_member_options = [0,1]
-        is_active_member = st.selectbox('Is Active Member', is_active_member_options)
-        st.write("0 = Not active member")
-        st.write("1 = Is active member")
+        col1, col2 = st.columns([1, 1])
+        has_credit_card = col1.radio(label='Has Credit Card?', options=['no', 'yes'])
+        active_member = col2.radio(label='Is Active Member?', options=['no', 'yes'])
 
 
         # submit button
-        submitted = st.form_submit_button('Predict')
+        submitted = st.button('Predict')
 
+        # load files
+        with open('model_xgb.pkl', 'rb') as file_2:
+            model = pickle.load(file_2)
+        with open('list_cat_cols.txt', 'rb') as file_3:
+            cat_cols = json.load(file_3)
+        with open('list_num_cols.txt', 'rb') as file_4:
+            num_cols = json.load(file_4)
 
-    # inference
-    
-    # with open('scaler.pkl', 'rb') as file_1:
-    #     scaler = pickle.load(file_1)
-    with open('model_knn.pkl', 'rb') as file_2:
-        model = pickle.load(file_2)
+        
+        data_inf = {
+            'CustomerId' : cust_id,
+            'Surname' : surname,
+            'geography' : geography,
+            'age' : age,
+            'gender' : gender,
+            'tenure' : tenure,
+            'credit_score' : creditscore,
+            'balance' : balance,
+            'estimated_salary' : estimated_salary,
+            'num_of_products' : num_of_products,
+            'has_credit_card' : has_credit_card,
+            'active_member' : active_member
+        }
 
-    
-    data_inf = {
-        'CustomerId' : cust_id,
-        'Surname' : surname,
-        'age' : age,
-        'gender' : gender,
-        'tenure' : tenure,
-        'credit_score' : creditscore,
-        'balance' : balance,
-        'estimated_salary' : estimated_salary,
-        'num_of_products' : num_of_products,
-        'HasCrCard' : HasCrCard,
-        'is_active_member' : is_active_member
-    }
+        # memasukkan data inference ke dataframe
+        data_inf = pd.DataFrame([data_inf])
+        st.dataframe(data_inf)
 
-    # memasukkan data inference ke dataframe
-    data_inf = pd.DataFrame([data_inf])
-    st.dataframe(data_inf)
+        # logic ketika predict button ditekan
+        if submitted:
+            data_inf_drop = data_inf.drop(['CustomerId', 'Surname'], axis=1)
 
-    # logic ketika predict button ditekan
-    if submitted:
-        data_inf_drop = data_inf.drop(['CustomerId', 'Surname'], axis=1)
-        # Create a new column "NewTenure"
-        data_feature_final = data_inf_drop["NewTenure"] = data_inf_drop["tenure"] / data_inf_drop["age"]
+        # predict
+            y_pred_inf = model.predict(data_inf_drop)
 
-        # data_inf_scaled = scaler.transform(data_inf_drop)
-
-    # predict
-        y_pred_inf = model.predict(data_feature_final)
-        st.write('## Customer :', str(int(y_pred_inf)))
-        st.write('### Not Churn : 0, Churn : 1')
-        st.write('### Churn : 1')
+            # conditional if 
+            if y_pred_inf == 0:
+                st.write('### Not Churn')
+            else :
+                st.write('### Churn')
+                st.markdown('-----------------')
+                # menampilkan rekomendasi jika terprediksi churn
+                st.write('#### Based on analysis of customer churn data patterns, we make these following recommendations: ')
+                st.markdown("""
+- Need to make offers and marketing more attractive to female customers.
+- Evaluate factors that make Spain have lower churn, and apply the same strategy to other countries.
+- Evaluate products  according to the needs of customers who have high incomes.
+- Create a program that can increase the profits of customers who actively make transactions and have high balances, such as giving vouchers/other benefits for every transaction with a certain value.
+- Create "bundling" or packages containing several products, where the bundling also provides special benefits that cannot be obtained if only use certain products/without bundling.
+""")
+        # tab 2 eda
+        with tab2:
+            looker_dashboard_url = "https://lookerstudio.google.com/s/omKUXbpaEps"
+            st.markdown(f"Go to Looker Dashboard: [{looker_dashboard_url}]({looker_dashboard_url})")
 
 if __name__ == '__main__':
     run()
